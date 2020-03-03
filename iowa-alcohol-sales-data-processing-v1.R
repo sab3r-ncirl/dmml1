@@ -1,8 +1,9 @@
+# Set the appropriate directory for the data file.
 getwd()
 setwd("C:/Users/Soham More/Documents/Github/dmml1/v1_Data_Processing/Iowa_Alcohol_Sales/")
 
 
-alcohol_df <- read.csv("Iowa_Liquor_Sales_Final.csv", header = TRUE)
+alcohol_df <- read.csv("Iowa_Liquor_Sales.csv", header = TRUE)
 
 library(dplyr)
 
@@ -11,9 +12,12 @@ library(dplyr)
 class(alcohol_df$Date)
 alcohol_df$Date <- as.character(alcohol_df$Date)
 
+# Check variable names.
+names(alcohol_df)
+
 # Install 'anytime' package to format the Date variables.
 install.packages("anytime")
-# Check is the date is formatted correctly before applying it to the dataframe.
+# Check if the date is formatted correctly before applying it to the dataframe.
 anytime::anydate(head(alcohol_df$Date)) 
 
 # Transform the Date values so that we can perform operations on it.
@@ -46,15 +50,15 @@ sapply(new_alcohol_df, function(x) sum(grepl("^\\s*$", x)))
 # Date - 0
 # Store.Number - 0
 # Store.Name - 0
-# Address - 965
-# City - 965
-# Zip.Code - 1010
-# Store.Location - 965
-# County.Number - 70455
-# County - 70455
-# Category - 1123
-# Category.Name - 7562
-# Vendor.Number - 2
+# Address - 29858
+# City - 29858
+# Zip.Code - 29903
+# Store.Location - 442574
+# County.Number - 0
+# County - 99348
+# Category - 0
+# Category.Name - 13600
+# Vendor.Number - 0
 # Vendor.Name - 0
 # Item.Number - 0
 # Item.Description - 0
@@ -67,33 +71,37 @@ sapply(new_alcohol_df, function(x) sum(grepl("^\\s*$", x)))
 # Volume.Sold..Liters. - 0
 # Volume.Sold..Gallons. - 0
 
+# Get all the store names where the County data is missing.
+StoreNamesWhereCountyDataIsMissing <- with(new_alcohol_df, unique(Store.Name[grepl("^\\s*$", County)]))
+write.csv(StoreNamesWhereCountyDataIsMissing, "Iowa_Liquor_Stores_With_Missing_County.csv")
+
 # Check unique values
 sapply(new_alcohol_df, function(x) length(unique(x)))
 # Unique Values:
-# Invoice.Item.Number - 4464362
+# Invoice.Item.Number - 4464376
 # Date - 473
 # Store.Number - 1540
 # Store.Name - 1645
-# Address - 2844
-# City - 766 
+# Address - 2840
+# City - 766
 # Zip.Code - 426
-# Store.Location - 3798
-# County.Number - 109
+# Store.Location - 1345
+# County.Number - 100
 # County - 201
-# Category - 104
-# Category.Name - 129
-# Vendor.Number - 193
-# Vendor.Name - 288
-# Item.Number - 4614
-# Item.Description - 3682
-# Pack - 22
-# Bottle.Volume..ml. - 39
-# State.Bottle.Cost - 1742
-# State.Bottle.Retail - 1809
-# Bottles.Sold - 322
-# Sale..Dollars. - 12749
-# Volume.Sold..Liters. - 806
-# Volume.Sold..Gallons. - 900
+# Category - 105
+# Category.Name - 130
+# Vendor.Number - 188
+# Vendor.Name - 297
+# Item.Number - 4615
+# Item.Description - 3867
+# Pack - 19
+# Bottle.Volume..ml. - 40
+# State.Bottle.Cost - 1793
+# State.Bottle.Retail - 1856
+# Bottles.Sold - 346
+# Sale..Dollars. - 13791
+# Volume.Sold..Liters. - 708
+# Volume.Sold..Gallons. - 735
 
 
 # Remove the '$' symbol from the columns 'Sale..Dollars.' 'State.Bottle.Retail' and 'State.Bottle.Cost'
