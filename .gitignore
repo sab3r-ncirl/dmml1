@@ -9,3 +9,7 @@ Read-only new/Iowa Weather Data/ghcnd-stations.txt
 Read-only new/Iowa Weather Data/METAR - format and abbreviations.pdf
 Read-only new/Iowa_Liquor_Sales.csv
 Read-only new/State_of_Iowa_Salary_Book.csv
+v1_Data_Processing/Iowa_Alcohol_Sales/Iowa_Liquor_Sales.csv
+v1_Data_Processing/Iowa_Alcohol_Sales/Iowa_Liquor_Sales_Final.csv
+v1_Data_Processing/Iowa_Alcohol_Sales/Iowa_Liquor_Sales_Final_2015_2016.csv
+*.csv
