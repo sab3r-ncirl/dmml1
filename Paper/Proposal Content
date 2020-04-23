@@ -1,5 +1,13 @@
 [IMP] Motivation (25% of marks. Max 300 words)
 
+Alcohol sales based on climate conditions
+
+Alcohol has been an integral part of cultures across the globe for many centuries. The consumption of alcohol occurs either during specific occasions like a wedding, a funeral, a birthday etc. or in a casual setting where freinds and family get together and have a couple of drinks. This study will attempt to find if in addition to the above mentioned events do any climatic factors affect the drinking pattern in people. The goal of this study is to try to find a pattern in the drinking habits of people [with focus on climate]. This study can prove to be a stepping stone for other alcohol consumption related studies such as 'Mishaps due to alcohol consumption', 'Health related issues due to alcohol consumption', 'Study of alcohol consumption and domestic violence' etc.
+
+
+
+Fatality in road accidents
+
 
 [IMP] Research Question (15% marks. Max 50 words.)
 
@@ -41,7 +49,9 @@ R-squared/Adjusted R-squared
 
 Classification:
 Accuracy cannot be used as the dataset is highly imbalanced.
-So methods like confusion matrix and Precision/Recall, F1 statistics will be used to evaluate the model.
+
+Confusion Matrix
+So methods like Precision/Recall, F1 statistics will be used to evaluate the model.
 
 
 
