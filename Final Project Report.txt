@@ -113,6 +113,7 @@ Ridge and Lasso regularizaztion techniques were also applied in this study to re
 --SVR
 
 In contrast to ordinary least squars (OLS), the objective function of support vector regression (SVR) is to minimize the coefficients — more specifically, the L2-norm (L2 norm is calculated as the square root of the sum of the squared vector values) of the coefficient vector — not the squared error. 
+SVR is a non-linear regression model whereas Multiple Linear Regression is a linear regression method. SVR was choosen for this stufy in order to check how a non-linear regression method performs in contrast to a linear regression method.
 
 B. Fatalities in road accidents
 This study was conducted to predict road accident fatalities based on the accident cuscumstances and the environment of the accident. This dataset is unbalanced as the number of accidents with fatalities is very small as compared to the number of accidents without fatalities.
@@ -124,6 +125,9 @@ Also, to remedy the unbalanced dataset, weights were used while building the log
 --Naive Bayes
 Naive Bayes classifier usually performs at par with other classifiers and it is a very robust model that can be used in most of the classification problems. 
 
+<<Check for bernoulli method and laplace smoothing for 0 probabilities >>
+
+
 --SVM
 SVM uses a error margin threshold to calculate the hyperplane what will divide the data into distinct classes.
 Both Linear and Radial kernals were used to build SVM models. Both these models were evaluated to check which one performs better in this study.
@@ -131,14 +135,212 @@ Both Linear and Radial kernals were used to build SVM models. Both these models 
 
 5. Evaluation
 A. Climatic effects on alcohol consumption
+Multiple Linea Regression
+Multiple evaluation metrics are used to compare the models. 
+
+Simple Multiple Linear Regression 
+RMSE(y_pred, test_set$Sale..Dollars.)
+[1] 52440.06
+
+> R2(y_pred, test_set$Sale..Dollars.)
+[1] 0.1153669
+
+
+K-Fold Multiple Linear Regression
+> rsquare_with_k_fold
+[1] 0.1093796
+
+
+Ridge Regression
+> R2(pred, actual_sales)
+[1,] 0.1153834
+
+Lasso Regression
+> R2(lasso_y_var[test], lasso_pred)
+0.1064434
+
+Elastic Net Regression
+R2(elastic_y_var[test], elastic_pred)
+0.10647
+
+
+
+Support Vector Regression
+
+> RMSE(svr_y_pred, test_set$Sale..Dollars.)
+[1] 56511.16
+> # (b) R-square
+> R2(svr_y_pred, test_set$Sale..Dollars.)
+[1] 0.06304156
+
+
+
+
 B. Fatalities in road accidents
 
-6. Deployment
-A. Climatic effects on alcohol consumption
-B. Fatalities in road accidents
+Logistic Regression
+> print(paste('Accuracy',1-misClasificError))
+[1] "Accuracy 0.97295006948917"
+
+> confusionMatrix(table(test1$Fatality, fitted.results), mode = "everything")
+Confusion Matrix and Statistics
+
+   fitted.results
+        0     1
+  0 28648    37
+  1   761    55
+                                         
+               Accuracy : 0.973          
+                 95% CI : (0.971, 0.9748)
+    No Information Rate : 0.9969         
+    P-Value [Acc > NIR] : 1              
+                                         
+                  Kappa : 0.1162         
+                                         
+ Mcnemar's Test P-Value : <2e-16         
+                                         
+            Sensitivity : 0.9741         
+            Specificity : 0.5978         
+         Pos Pred Value : 0.9987         
+         Neg Pred Value : 0.0674         
+              Precision : 0.9987         
+                 Recall : 0.9741         
+                     F1 : 0.9863         
+             Prevalence : 0.9969         
+         Detection Rate : 0.9711         
+   Detection Prevalence : 0.9723         
+      Balanced Accuracy : 0.7860         
+                                         
+       'Positive' Class : 0              
+                              
+
+> cm = table(test1$Fatality, fitted.results)
+> cm
+   fitted.results
+        0     1
+  0 28648    37
+  1   761    55
+> logistic_recall <- diag(cm) / rowSums(cm)
+> logistic_recall
+         0          1 
+0.99871013 0.06740196
+
+## Logistic with weights
+> print(paste('Accuracy',1-misClasificError))
+[1] "Accuracy 0.734381885359818"
+
+> confusionMatrix(table(test1$Fatality, fitted.results), mode="everything")
+Confusion Matrix and Statistics
+
+   fitted.results
+        0     1
+  0 20981  7704
+  1   132   684
+                                          
+               Accuracy : 0.7344          
+                 95% CI : (0.7293, 0.7394)
+    No Information Rate : 0.7157          
+    P-Value [Acc > NIR] : 3.863e-13       
+                                          
+                  Kappa : 0.1034          
+                                          
+ Mcnemar's Test P-Value : < 2.2e-16       
+                                          
+            Sensitivity : 0.99375         
+            Specificity : 0.08155         
+         Pos Pred Value : 0.73143         
+         Neg Pred Value : 0.83824         
+              Precision : 0.73143         
+                 Recall : 0.99375         
+                     F1 : 0.84264         
+             Prevalence : 0.71567         
+         Detection Rate : 0.71120         
+   Detection Prevalence : 0.97234         
+      Balanced Accuracy : 0.53765         
+                                          
+       'Positive' Class : 0      
+
+> cm = table(test1$Fatality, fitted.results)
+> cm
+   fitted.results
+        0     1
+  0 20981  7704
+  1   132   684
+> logistic_recall <- diag(cm) / rowSums(cm)
+> logistic_recall
+        0         1 
+0.7314276 0.8382353
+
+
+##Naive Bayes
+
+> naive_cm
+   naive_pred
+        0     1
+  0 30272   140
+  1    72   822
+
+> confusionMatrix(table(test1$Fatality, naive_pred), mode="everything")
+Confusion Matrix and Statistics
+
+   naive_pred
+        0     1
+  0 30272   140
+  1    72   822
+                                          
+               Accuracy : 0.9932          
+                 95% CI : (0.9923, 0.9941)
+    No Information Rate : 0.9693          
+    P-Value [Acc > NIR] : < 2.2e-16       
+                                          
+                  Kappa : 0.8823          
+                                          
+ Mcnemar's Test P-Value : 4.193e-06       
+                                          
+            Sensitivity : 0.9976          
+            Specificity : 0.8545          
+         Pos Pred Value : 0.9954          
+         Neg Pred Value : 0.9195          
+              Precision : 0.9954          
+                 Recall : 0.9976          
+                     F1 : 0.9965          
+             Prevalence : 0.9693          
+         Detection Rate : 0.9670          
+   Detection Prevalence : 0.9714          
+      Balanced Accuracy : 0.9260          
+                                          
+       'Positive' Class : 0 
+> naive_recall <- diag(naive_cm) / rowSums(naive_cm)
+> naive_recall
+        0         1 
+0.9953966 0.9194631
 
 
 
+
+Support Vector Machine
+
+> cm_svm_radial
+   y_pred_svm_radial
+        0     1
+  0 30412     0
+  1   894     0
+> cm_svm_linear
+   y_pred_svm_linear
+        0     1
+  0 30403     9
+  1   883    11
+
+> # SVM Recall for Radial Model
+> svm_recall <- diag(cm_svm_radial) / rowSums(cm_svm_radial)
+> svm_recall
+0 1 
+1 0 
+> # SVM Recall for Linear Model
+> svm_recall <- diag(cm_svm_linear) / rowSums(cm_svm_linear)
+> svm_recall
+         0          1 
+0.99970406 0.01230425 
 
 
 $Evaluation (25% All key decisions are justified with appropriate literature. The project extends well beyond simply applying models to complex datasets, and thoroughly investigates a diverse range of situations, parametrizations, and sampling methods to give a very rich understanding of performance.)
