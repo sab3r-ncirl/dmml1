@@ -30,7 +30,7 @@ with open('Iowa_Liquor_Stores_With_Missing_County.csv') as missingDataFile:
 			'input' : storeName,
 			'inputtype' : 'textquery',
 			'fields' : 'formatted_address,name,geometry',
-			'key' : 'AIzaSyDZhumF-LfgXG5FtXCm1OnJvVZxuH2BgGI',
+			'key' : '{API Key removed for security purpose}',
 		}
 		response = requests.get(url = apiUrl, params = PARAMS)
 		jsonReply = response.json()
