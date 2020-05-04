@@ -13,6 +13,14 @@ head(world)
 
 accidents_df_for_plotting <- read.csv('C:/Users/Soham More/Documents/Github/dmml1/Datasets/Iowa_Road_Accidents/v1_Data_Processing/Road_Accidents_2015_2016.csv', header = TRUE)
 
+## Occupants boxplot
+
+boxplot(accidents_df_for_plotting$Occupants[accidents_df_for_plotting$Occupants < 30], xlab = 'Nmber of occupants',
+        ylab = 'Frequency')
+p <- ggplot(accidents_df_for_plotting[accidents_df_for_plotting$Occupants < 30,], aes(x='', y = Occupants)) + 
+  geom_boxplot(alpha=0.2, fill ="blue")
+p
+
 fatality_locations <- accidents_df_for_plotting$Crash.Location[accidents_df$Fatalities>0]
 fatality_locations <- sub("\\).*", "", sub(".*\\(", "", fatality_locations)) 
 fatality_locations <- data.frame(do.call('rbind', strsplit(as.character(fatality_locations),' ',fixed=TRUE)))
@@ -25,20 +33,20 @@ fatality_locations$latitude <- as.numeric(as.character(fatality_locations$latitu
                                   crs = 4326, agr = "constant"))
 
 
-#accident_location <- accidents_df$Crash.Location
-#accident_location
-#accident_location <- sub("\\).*", "", sub(".*\\(", "", accident_location)) 
-#accident_location
-#accident_location_df <- data.frame(do.call('rbind', strsplit(as.character(accident_location),' ',fixed=TRUE)))
-#tail(accident_location_df)
-#colnames(accident_location_df) <- c('longitude', 'latitude')
+accident_location <- accidents_df_for_plotting$Crash.Location
+accident_location
+accident_location <- sub("\\).*", "", sub(".*\\(", "", accident_location)) 
+accident_location
+accident_location_df <- data.frame(do.call('rbind', strsplit(as.character(accident_location),' ',fixed=TRUE)))
+tail(accident_location_df)
+colnames(accident_location_df) <- c('longitude', 'latitude')
 
-#str(accident_location_df)
+str(accident_location_df)
 
-#head(accident_location_df$lonogitude)
-#accident_location_df$longitude <- as.numeric(as.character(accident_location_df$longitude))
-#accident_location_df$latitude <- as.numeric(as.character(accident_location_df$latitude))
-#head(accident_location_df)
+head(accident_location_df$longitude)
+accident_location_df$longitude <- as.numeric(as.character(accident_location_df$longitude))
+accident_location_df$latitude <- as.numeric(as.character(accident_location_df$latitude))
+head(accident_location_df)
 
 #(accident_location_sf <- st_as_sf(accident_location_df, coords = c("longitude", "latitude"), 
 #                   crs = 4326, agr = "constant"))
@@ -60,6 +68,10 @@ counties <- subset(counties, grepl("iowa", counties$ID))
 counties$area <- as.numeric(st_area(counties))
 head(counties)
 
+
+
+
+
 str(accident_location_df)
 accident_location_df$longitude <- as.numeric(accident_location_df$longitude)
 accident_location_df$latitude <- as.numeric(accident_location_df$latitude)
@@ -67,7 +79,7 @@ accident_location_df$latitude <- as.numeric(accident_location_df$latitude)
 (accident_location_sf <- st_as_sf(accident_location_df, coords = c("longitude", "latitude"), 
                                   crs = 4326, agr = "constant"))
 
-View(counties)
+#View(counties)
 library(ggspatial)
 
 ggplot(data = world) +
@@ -144,9 +156,9 @@ ggplot(data = world) +
 ## Plot seasonality in alcohol sales
 #####
 
-alcohol_df_for_plotting <- read.csv("C:\\Users\\Soham More\\Documents\\GitHub\\dmml1\\Datasets\\Iowa_Liquor_Sales/v1_Data_Processing/alcohol_df_aggregate.csv", header = TRUE)
+alcohol_df_for_plotting <- read.csv("C:\\Users\\Soham More\\Documents\\GitHub\\dmml1\\Datasets\\final_merged_alcohol_weather_with_0_prcp_temp_cleaned.csv", header = TRUE)
 str(alcohol_df_for_plotting)
-alcohol_df_for_plotting <- aggregate(. ~ Date,data=alcohol_df_for_plotting, FUN=sum, na.rm=TRUE, na.action=NULL)
+#alcohol_df_for_plotting <- aggregate(. ~ Date,data=alcohol_df_for_plotting, FUN=sum, na.rm=TRUE, na.action=NULL)
 
 library(ggplot2)
 
@@ -154,31 +166,45 @@ library(ggplot2)
 ggplot(data = alcohol_df_for_plotting, aes(x = Date, y = Sale..Dollars., group = 1))+
   geom_line(color = "#00AFBB", size = 1)
 
-ggplot(data = alcohol_df, aes(x = Date, y = TMIN, group = 1))+
+ggplot(data = alcohol_df_for_plotting, aes(x = Date, y = TMIN, group = 1))+
   geom_line(color = "#00AFBB", size = 1)
 
 
 ### Plotting Histogram of temperatures
 
-hist(alcohol_df$TMAX)
-hist(alcohol_df$TMIN)
+hist(alcohol_df_for_plotting$TMAX)
+hist(alcohol_df_for_plotting$TMIN)
+boxplot(alcohol_df_for_plotting$PRCP)
+hist(alcohol_df_for_plotting$SNWD)
+boxplot(alcohol_df_for_plotting$AWND)
 
-ggplot(alcohol_df, aes(alcohol_df)) + 
-  geom_histogram(data=subset(alcohol_df,y == 'TMAX'), fill = "red", alpha = 0.2) + 
-  geom_histogram(data=subset(alcohol_df,y == 'TMIN'), fill = "blue", alpha = 0.2) 
-p <- alcohol_df %>%
-ggplot( aes(x=TMAX, fill=type)) +
-  geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') +
-  scale_fill_manual(values=c("#69b3a2", "#404080")) +
-  theme_ipsum() +
-  labs(fill="")
+
 
 ggplot(data = alcohol_df) +
-  geom_histogram(aes(x = TMAX, y=(..count..)), 
+  scale_size_area() + 
+  labs(x = "Temperature",
+       y = "Frequency",
+       title = "Histograms of TMAX and TMIN") +
+  geom_histogram(aes(x = TMAX, y=(..count..), fill = TMAX), 
                  alpha=0.2, fill ="red",binwidth=2,position="dodge", size =0.5, color = "#FFFFFF") +
-  geom_histogram(aes(x = TMIN, y=(..count..)), 
+  geom_histogram(aes(x = TMIN, y=(..count..), fill = TMIN), 
                  alpha=0.2,, fill ="blue",binwidth=2,position="dodge", size =0.5, color = "#FFFFFF")
+  
+ggplot(data = alcohol_df_for_plotting) +
+  scale_size_area() + 
+  labs(x = "Precipitation",
+       y = "Frequency",
+       title = "Histograms of PRCP") +
+  geom_histogram(aes(x = PRCP, y=(..count..), fill = PRCP), 
+                 alpha=0.2, fill ="red",binwidth=2,position="dodge", size =0.5, color = "#FFFFFF")
 
+ggplot(data = alcohol_df_for_plotting) +
+  scale_size_area() + 
+  labs(x = "Wind",
+       y = "Frequency",
+       title = "Histograms of AWND") +
+  geom_histogram(aes(x = AWND, y=(..count..), fill = AWND), 
+                 alpha=0.2,, fill ="blue",binwidth=2,position="dodge", size =0.5, color = "#FFFFFF")
 
 # PLotting ROC
 
@@ -197,19 +223,119 @@ rocobj_svm <- roc(var1, var5)
 #rocobj2 <- roc(aSAH$outcome, aSAH$wfns)
 
 library(ggplot2)
-g <- ggroc(rocobj, alpha = 0.5, colour = "red", linetype = 2, size = 2)
-g
-
-g + theme_minimal() + ggtitle("My ROC curve") + 
-  geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color="grey", linetype="dashed")
-
-
-gl <- ggroc(rocobj, legacy.axes = TRUE)
-gl
-gl + xlab("FPR") + ylab("TPR") + 
-  geom_segment(aes(x = 0, xend = 1, y = 0, yend = 1), color="darkgrey", linetype="dashed")
 
 
 g2 <- ggroc(list(NaiveBayes=rocobj_naive, LogisticRegresssion=rocobj_logit, WeightedLogisticRegression=rocobj_weighted_logit, SVM = rocobj_svm),  size = 1)
 g2  + xlab("FPR") + ylab("TPR") + theme_minimal() + ggtitle("ROC Curve Comparison") + 
   geom_segment(aes(x = 1, xend = 0, y = 0, yend = 1), color="black", linetype="dashed")
+
+
+
+#################################################
+##### PLotting time series of alcohol sales #####
+#################################################
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(hrbrthemes)
+library(knitr)
+library(printr)
+library(plyr)
+library(dplyr)
+library(lubridate)
+library(gridExtra)
+library(reshape2)
+library(TTR)
+library(xts)
+
+# Load dataset from file
+liquor_store_df <- read.csv('C:/Users/Soham More/Documents/GitHub/dmml1/Datasets/Iowa_Liquor_Sales/v1_Data_Processing/Iowa_Liquor_Sales_Final_2015_2016_v2.csv', header = TRUE)
+liquor_store_df$Date <- as.Date(liquor_store_df$Date)
+ts_date <- as.Date(liquor_store_df$Date)
+
+
+ts_aggregate_data <- aggregate(x = liquor_store_df[c("Sale..Dollars.")],
+                     FUN = sum,
+                     by = list(Group.date = liquor_store_df$Date))
+head(ts_aggregate_data)
+
+#table(ts_aggregate_data$Sale..Dollars.[ts_aggregate_data$Sale..Dollars. < 200000])
+
+
+# Get 2015 data only
+#ts_aggregate_above_200000 <- ts_aggregate_data[ts_aggregate_data$Sale..Dollars. > 200000]
+
+ts_SMA3 <- SMA(ts_aggregate_data$Sale..Dollars., n=5)
+# Usual area chart
+p <- ts_aggregate_data %>%
+  ggplot( aes(x=Group.date, y=ts_SMA3)) +
+  geom_area(fill="#69b3a2", alpha=0.5) +
+  geom_line(color="#69b3a2") +
+  ylab("Alcohol Sales ($)") +
+  xlab("Date") +
+  theme_ipsum()
+# Turn it interactive with ggplotly
+p <- ggplotly(p)
+p
+
+#ts_df <- xts(ts_aggregate_data[,-1], order.by = as.Date(ts_aggregate_data[,1], "%d/%m/%Y"), frequency = 360)
+#summary(ts_df)
+#length(ts_df)
+
+
+
+
+## Boxplots
+
+p10 <- ggplot(alcohol_df_for_plotting, aes(x= County, y = log(Sale..Dollars.))) +
+  geom_boxplot()
+p10
+
+
+## Correlation matrix 
+
+liquor_df_temp <- read.csv('C:/Users/Soham More/Documents/GitHub/dmml1/Datasets/Iowa_Liquor_Sales/v1_Data_Processing/alcohol_df_aggregate_with_categories.csv', header = TRUE)
+
+str(liquor_df_temp)
+
+install.packages('ggcorrplot')
+library(ggcorrplot)
+str(alcohol_df_for_plotting)
+plot(log(alcohol_df_for_plotting$Sale..Dollars.), alcohol_df_for_plotting$TMAX)
+alcohol_df_temp <- alcohol_df_for_plotting
+length(alcohol_df_for_plotting$Date)
+str(alcohol_df_for_plotting)
+length(alcohol_df_temp$Date)
+cor_matrix <- alcohol_df_temp[c('Sale..Dollars.', 'Volume.Sold..Liters.', 'TMAX', 'TMIN', 'PRCP', 'AWND', 'SNOW', 'SNWD')]
+cor_matrix$Volume.Sold..Liters. <- log(alcohol_df_temp$Volume.Sold..Liters.)
+cor_matrix$Sale..Dollars. <- sqrt(alcohol_df_temp$Sale..Dollars.)
+
+head(cor_matrix)
+corr <- cor(cor_matrix, use = "complete.obs")
+ggcorrplot(corr, lab = TRUE)
+head(cor_matrix)
+
+
+
+
+
+
+#### Accidents fatalities by factors
+
+accidents_df_fatality <- accidents_df[accidents_df$Fatality == 1,]
+
+ggplot(data=accidents_df_fatality, aes(x=Surface.Conditions)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(data=accidents_df_fatality, aes(x=Major.Cause)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  theme(axis.text.x = element_text(angle = 90))
+
+ggplot(data=accidents_df_fatality, aes(x=Light.Conditions)) +
+  geom_bar() +
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  theme(axis.text.x = element_text(angle = 90))
+

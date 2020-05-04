@@ -9,15 +9,15 @@ head(accidents_df)
 summary(accidents_df)
 
 
-par(mfrow=c(1,1))
+#par(mfrow=c(1,1))
 
-hist(accidents_df$Property.Damage)
+#hist(accidents_df$Property.Damage)
 
-boxplot(accidents_df$Property.Damage)
+#boxplot(accidents_df$Property.Damage)
 
-library(Amelia)
+#library(Amelia)
 
-missmap(accidents_df)
+#missmap(accidents_df)
 
 sapply(accidents_df,function(x) sum(is.na(x)))
 sapply(accidents_df, function(x) length(unique(x)))
@@ -50,7 +50,7 @@ accidents_df$Route <- NULL
 accidents_df$Crash.Location <- NULL
 
 
-install.packages('caTools')
+#install.packages('caTools')
 
 
 # Encode target variable as factor
@@ -61,8 +61,16 @@ class(accidents_df_backup$Occupants)
 
 
 # Remove rows where occupants > 30 as these might be errors
-accidents_df <- accidents_df_backup[accidents_df_backup$Occupants < 31,]
+accidents_df <- accidents_df_backup[accidents_df_backup$Occupants < 30,]
 boxplot(accidents_df$Occupants)
+
+
+
+
+
+## check Chi-square
+str(accidents_df)
+lapply(accidents_df[,c('Major.Cause','Crash.Manner','Crash.Severity','Surface.Conditions','Drug.Alcohol.Related','Light.Conditions', 'Weather.Conditions', 'Vehicles', 'Occupants', 'Property.Damage')], function(x) chisq.test(table(x,accidents_df$Fatality))$p.value)
 
 ######################
 ## Train Test Split ##
@@ -127,10 +135,10 @@ predicted.data$rank <- 1:nrow(predicted.data)
 library(ggplot2)
 library(cowplot)
 
-ggplot(data = predicted.data, aes(x=rank, y=probability.of.fatality)) +
-  geom_point(aes(color=fatality), alpha=1, shape=4, stroke=2) +
-  xlab("Index") +
-  ylab("Predicted probability of fatality")
+#ggplot(data = predicted.data, aes(x=rank, y=probability.of.fatality)) +
+#  geom_point(aes(color=fatality), alpha=1, shape=4, stroke=2) +
+#  xlab("Index") +
+#  ylab("Predicted probability of fatality")
 
 #ggsave()
 
@@ -156,7 +164,7 @@ table(weight)
 
 weighted_logistic_model <- glm(Fatality ~Major.Cause+Crash.Manner+Surface.Conditions+Drug.Alcohol.Related+Light.Conditions+Light.Conditions+Weather.Conditions+Vehicles+Occupants+Property.Damage,family=binomial(link='logit'),data=train1, weights = weight)
 
-varImp(weighted_logistic_model)
+#varImp(weighted_logistic_model)
 summary(weighted_logistic_model)
 
 
@@ -187,10 +195,12 @@ weighted_predicted.data$rank <- 1:nrow(weighted_predicted.data)
 library(ggplot2)
 library(cowplot)
 
-ggplot(data = weighted_predicted.data, aes(x=rank, y=probability.of.fatality)) +
-  geom_point(aes(color=fatality), alpha=1, shape=4, stroke=2) +
-  xlab("Index") +
-  ylab("Predicted probability of fatality")
+head(weighted_predicted.data)
+
+#ggplot(data = weighted_predicted.data, aes(x=rank, y=probability.of.fatality)) +
+#  geom_point(aes(color=fatality), alpha=1, shape=4, stroke=2) +
+#  xlab("Index") +
+#  ylab("Predicted probability of fatality")
 
 #ggsave()
 
@@ -207,6 +217,7 @@ plot(weighted_prf)
 # F1 score using ROCR
 weighted_logistic_f1_score <- performance(pr,"f")
 weighted_logistic_f1_score
+
 
 #auc <- performance(pr, measure = "auc")
 #auc <- auc@y.values[[1]]
@@ -280,6 +291,49 @@ prf_naive <- performance(pr_naive, measure = "tpr", x.measure = "fpr")
 plot(prf_naive)
 
 
+##########################################
+### Naive Bayes with Laplace Smoothing ###
+##########################################
+
+
+classifier_laplace = naiveBayes(x = train1[-21], y = train1$Fatality, laplace = 1)
+
+
+
+library(caret)
+#varImp(classifier)
+
+summary(classifier_laplace)
+
+# Predicting values in the test dataset
+
+naive_pred_laplace = predict(classifier_laplace, newdata = test1[-21])
+#View(naive_pred)
+naive_laplace_cm = table(test1$Fatality, naive_pred_laplace)
+naive_laplace_cm
+confusionMatrix(table(test1$Fatality, naive_pred_laplace), mode="everything", positive = "1")
+#recall(table(test1$Fatality, naive_pred), relevant = levels(test1$Fatality)[2])
+levels(test1$Fatality)
+
+## Checking the Recall in Naive Bayes classifier
+
+naive_laplace_recall <- diag(naive_laplace_cm) / colSums(naive_laplace_cm)
+naive_laplace_recall
+
+# plot naive bayes confusion matrix
+plot(naive_laplace_cm)
+
+# Plotting ROC for Naive Bayes
+
+p_naive_laplace <- predict(classifier_laplace, newdata=test1[-38], type="raw")
+class(p_naive_laplace)
+table(p_naive_laplace)
+p_naive_laplace[,2]
+class(test1$Fatality)
+pr_naive_laplace <- prediction(p_naive_laplace[,2], test1$Fatality)
+prf_naive_laplace <- performance(pr_naive_laplace, measure = "tpr", x.measure = "fpr")
+plot(prf_naive_laplace)
+
 
 
 
@@ -340,9 +394,7 @@ prf_svm <- performance(pr_svm, measure = "tpr", x.measure = "fpr")
 plot(prf_svm)
 
 
-# Metrics for evaluating the fit of the models (Recall)
-naive_bayes_recall <- diag(naive_cm) / rowSums(naive_cm)
-naive_bayes_recall
+
 
 
 
@@ -401,8 +453,8 @@ regressor = lm(formula = Sale..Dollars. ~ PRCP + AWND + SNOW + SNWD + TMAX + TMI
 summary(regressor)
 
 # diagnostic plots
-layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
-plot(regressor)
+#layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
+#plot(regressor)
 
 y_pred = predict(regressor, newdata = test_set)
 
@@ -463,7 +515,7 @@ dependent_vars <- training_set$Sale..Dollars.
 lambda_seq <- 10^seq(2, -2, by = -.1)
 #lambda_seq <- as.numeric(unlist(lambda_seq))
 #dependent_vars <- as.numeric(unlist(dependent_vars))
-
+lambda_seq
 
 fit <- glmnet(independent_vars, dependent_vars, alpha = 0, lambda  = lambda_seq)
 summary(fit)
@@ -503,29 +555,30 @@ lambda_seq <- 10^seq(2, -2, by = -.1)
 # Splitting the data into test and train
 set.seed(86)
 train = sample(1:nrow(lasso_x_vars), nrow(lasso_x_vars)/2)
-x_test = (-train)
-y_test = lasso_y_var[test]
-
+x_test = lasso_x_vars[-train,]
+x_test
+y_test = lasso_y_var[-train]
+y_test
 cv_output <- cv.glmnet(lasso_x_vars[train,], lasso_y_var[train],
                        alpha = 1, lambda = lambda_seq)
 
 # identifying best lamda
 best_lam <- cv_output$lambda.min
-best_lam
+#best_lam
 
 
 # Rebuilding the model with best lamda value identified
 lasso_best <- glmnet(lasso_x_vars[train,], lasso_y_var[train], alpha = 1, lambda = best_lam)
-lasso_pred <- predict(lasso_best, s = best_lam, newx = lasso_x_vars[test,])
+lasso_pred <- predict(lasso_best, s = best_lam, newx = x_test)
 
 # Finally, we combine the predicted values and actual values to see the two values side by side and then you can use the 
 # R-Squared formula to check the model performance. Note - you must calculate the R-Squared values for both train and test dataset.
 
-final <- cbind(lasso_y_var[test], lasso_pred)
+final <- cbind(y_test, lasso_pred)
 # Checking the first six obs
 head(final)
-R2(lasso_y_var[test], lasso_pred)
-RMSE(lasso_pred, lasso_y_var[test])
+R2(y_test, lasso_pred)
+RMSE(lasso_pred, y_test)
 
 
 
@@ -539,29 +592,29 @@ lambda_seq <- 10^seq(2, -2, by = -.1)
 # Splitting the data into test and train
 set.seed(86)
 train = sample(1:nrow(elastic_x_vars), nrow(elastic_x_vars)/2)
-elastic_net_x_test = (-train)
-elastic_net_y_test = elastic_y_var[test]
+elastic_net_x_test = elastic_x_vars[-train,]
+elastic_net_y_test = elastic_y_var[-train]
 
 elastic_cv_output <- cv.glmnet(elastic_x_vars[train,], elastic_y_var[train],
                                alpha = 1, lambda = lambda_seq)
 
 # identifying best lamda
 best_lam <- elastic_cv_output$lambda.min
-best_lam
+#best_lam
 
 
 # Rebuilding the model with best lamda value identified
 elastic_best <- glmnet(elastic_x_vars[train,], elastic_y_var[train], alpha = 0.5, lambda = best_lam)
-elastic_pred <- predict(elastic_best, s = best_lam, newx = elastic_x_vars[test,])
+elastic_pred <- predict(elastic_best, s = best_lam, newx = elastic_net_x_test)
 
 # Finally, we combine the predicted values and actual values to see the two values side by side and then you can use the 
 # R-Squared formula to check the model performance. Note - you must calculate the R-Squared values for both train and test dataset.
 
-final <- cbind(elastic_y_var[test], elastic_pred)
+final <- cbind(elastic_net_y_test, elastic_pred)
 # Checking the first six obs
 head(final)
-RMSE(elastic_pred, elastic_y_var[test])
-R2(elastic_y_var[test], elastic_pred)
+RMSE(elastic_pred, elastic_net_y_test)
+R2(elastic_net_y_test, elastic_pred)
 
 
 #########

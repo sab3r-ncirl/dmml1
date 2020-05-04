@@ -8,7 +8,7 @@ setwd("C:/Users/Soham More/Documents/Github/dmml1/Datasets/Iowa_Liquor_Sales/v1_
 rm(alcohol_df)
 alcohol_df <- read.csv("Iowa_Liquor_Sales_Final_2015_2016.csv", header = TRUE)
 
-# Read the correct data
+  # Read the correct data
 correctCountyData <- read.csv("Data_From_Maps_API.csv", header = TRUE)
 
 alcohol_df[] <- lapply(alcohol_df, as.character)
